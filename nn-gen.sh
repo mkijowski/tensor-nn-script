@@ -79,7 +79,7 @@ def train_neural_network(x):
 		for epoch in range(hm_epochs):
 			epoch_loss = 0
 			
-			##mnist-data is used here, switch
+			##mnist-data and batch_size execution is used here, needs changed if you are not using mnist data set
 			for _ in range(int(mnist.train.num_examples/batch_size)):
 				epoch_x, epoch_y = mnist.train.next_batch(batch_size)
 				_, c = sess.run([optimizer, cost], feed_dict = {x: epoch_x, y: epoch_y})
