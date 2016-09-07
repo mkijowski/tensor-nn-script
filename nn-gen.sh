@@ -4,7 +4,7 @@
 #usage: expects name of python output file, number of hidden layers, followed by number of nodes in each layer 
 # All hidden layers get the same number of nodes, if you would like to change that simply do so after creating the template
 # start configuration of python file:
-#new comment here
+
 if [ $# -eq 0 ]  # Must have command-line args to demo script.
 then
     echo "Please invoke this script with one or more command-line arguments (see header of script)."
