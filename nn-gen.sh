@@ -27,10 +27,13 @@ done
 
 echo "
 ##mnist dependent data below (inputs and classes) change for other data sets
-n_classes = 10 ###define number classes here
-n_inputs = 784
-batch_size = 100
+n_classes = 10 		 ###mnist data is handwritten digits 0-9
+n_inputs = 784 		 ###mnist data is 28x28 pixels which we squahs to 784
+batch_size = 500	 ### batch size can be tweaked depending on amount of RAM
 
+## x is your data, you do not need to specify the size of the matrix [None, n_inputs], 
+## but this will cause tensorflow to throw an error if data is loaded outside of that shape
+## This may need to be changed if your data set is not the mnist
 x = tf.placeholder('float',[None, n_inputs])
 y = tf.placeholder('float')
 
