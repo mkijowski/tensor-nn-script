@@ -26,11 +26,12 @@ do
 done
 
 echo "
+##mnist dependent data below (inputs and classes) change for other data sets
 n_classes = 10 ###define number classes here
+n_inputs = 784
 batch_size = 100
 
-#note, this placeholder may be specific to mnist data set, probably need to change the 784 here and in first hidden layer
-x = tf.placeholder('float',[None, 784])
+x = tf.placeholder('float',[None, n_inputs])
 y = tf.placeholder('float')
 
 def neural_network_model(data):" >> $1
@@ -39,7 +40,7 @@ for i in $(seq 1 $2)
 do
     if [ $i -eq 1 ]
     then
-	echo "    hidden_"$i"_layer = {'weights':tf.Variable(tf.random_normal([784, n_nodes_hl1])),'biases':tf.Variable(tf.random_normal([n_nodes_hl1]))}" >> $1
+	echo "    hidden_"$i"_layer = {'weights':tf.Variable(tf.random_normal([n_inputs, n_nodes_hl1])),'biases':tf.Variable(tf.random_normal([n_nodes_hl1]))}" >> $1
     else
 	echo "    hidden_"$i"_layer = {'weights':tf.Variable(tf.random_normal([n_nodes_hl$((i-1)), n_nodes_hl$i])),'biases':tf.Variable(tf.random_normal([n_nodes_hl$i]))}" >> $1
     fi
