@@ -13,3 +13,8 @@ The filename.py can then be executed without further editing:
 $ python filename.py
 
 OR can be edited for use with other data sets (look for comments with mnist
+
+Most of this code is derived from https://www.tensorflow.org/versions/r0.10/tutorials/mnist/pros/index.html
+And can be found in the tensorflow github repos.
+
+Other code came from https://www.youtube.com/user/sentdex who has some awesome videos on machine learning and tensorflow.
