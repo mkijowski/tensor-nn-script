@@ -1,14 +1,30 @@
 import tensorflow as tf
+import argparse
 
 #need to import data here
 #mnist data loaded here, change!
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
 
-### basic tweakable settings can be found here
-n_nodes_hl1 = 500
-n_nodes_hl2 = 500
-n_nodes_hl3 = 500
+##########
+parser = argparse.ArgumentParser(description='Demonstrate user input argument parsing')
+# collects one argument
+parser.add_argument('numLayers', type=int, help='Number of hidden layers')
+
+# collects argument/s in list (python version of arraylist)
+parser.add_argument('numNodesPer', type=int, help='Number of nodes in each layer (If only 1 arg given, then 1 arg applied to each layer)', nargs='+')
+
+args = parser.parse_args()
+# if a user inputted more than 1 value for numNodesPer argument
+if len(args.numNodesPer) > 1:
+	# check to make sure there are same number of values as the number of layers
+	if not len(args.numNodesPer) == args.numLayers:
+		print 'Must have at least ' + str(args.numLayers) + ' of Nodes Per Layer arguments'
+
+# Define a list of size numLayers. (Because python wants to .append() for a list, and I don't conform to their standards)
+hidden_layers = [None]*args.numLayers
+n_nodes_hl = args.numNodesPer
+##########
 
 n_classes = 10 		 ###mnist data is handwritten digits 0-9
 n_inputs = 784 		 ###mnist data is 28x28 pixels which we squahs to 784
@@ -33,42 +49,35 @@ def conv2d(x, W):
 def max_pool_2x2(x):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],strides=[1, 2, 2, 1], padding='SAME')
 
-#### Long(er) form of writing out a 3 hidden layer, fully connected neural network
-#### Biases and weights are random normal
-def old_neural_network_model(data):
-    hidden_1_layer = {'weights':tf.Variable(tf.random_normal([n_inputs, n_nodes_hl1])),'biases':tf.Variable(tf.random_normal([n_nodes_hl1]))}
-    hidden_2_layer = {'weights':tf.Variable(tf.random_normal([n_nodes_hl1, n_nodes_hl2])),'biases':tf.Variable(tf.random_normal([n_nodes_hl2]))}
-    hidden_3_layer = {'weights':tf.Variable(tf.random_normal([n_nodes_hl2, n_nodes_hl3])),'biases':tf.Variable(tf.random_normal([n_nodes_hl3]))}
-    output_layer = {'weights':tf.Variable(tf.random_normal([n_nodes_hl3, n_classes])),'biases':tf.Variable(tf.random_normal([n_classes]))}
-
-    l1 = tf.nn.relu(tf.add(tf.matmul(data, hidden_1_layer['weights']), hidden_1_layer['biases']))
-    l2 = tf.nn.relu(tf.add(tf.matmul(l1, hidden_2_layer['weights']), hidden_2_layer['biases']))
-    l3 = tf.nn.relu(tf.add(tf.matmul(l2, hidden_3_layer['weights']), hidden_3_layer['biases']))
-
-    output = tf.matmul(l3, output_layer['weights']) + output_layer['biases']
-    return output
-
-#### shorter form of same network, changed from random normal initialized variables to truncated normal
-#### see tf.random_normal and tf.truncated_normal for more info
 def neural_network_model(data):
-    W_fc1 = weight_variable([n_inputs, n_nodes_hl1])
-    b_fc1 = bias_variable([n_nodes_hl1])
+	# must explicitely instantiate list in python if you want to insert/append
+	# alternatively you can only insert into a new list with W_fc = [blah]
+	W_fc = []
+	b_fc = []
+	l = []
+	print n_nodes_hl
+	for i in xrange(args.numLayers):
+		if i==0:
+			W_fc.insert(i, weight_variable([n_inputs,n_nodes_hl[i]]))
+			b_fc.insert(i, bias_variable([n_nodes_hl[i]]))
+		elif i == args.numLayers - 1:
+			W_fc.insert(i, weight_variable([n_nodes_hl[i-1],n_classes]))
+			b_fc.insert(i, bias_variable([n_classes]))
+		else:
+			# what if n_nodes_hl is only one value
+			# ex. newmatnn.py 3 784
+			W_fc.insert(i, weight_variable([n_nodes_hl[i-1],n_nodes_hl[i]]))
+			b_fc.insert(i, bias_variable([n_nodes_hl[i]]))
+ 
+	for i in xrange(args.numLayers):
+		if i==0:
+			l.insert(i, tf.nn.relu(tf.matmul(data,W_fc[i]) + b_fc[i]))
+		elif i == args.numLayers - 1:
+			l.insert(i, tf.matmul(l[i-1], W_fc[i]) + b_fc[i])
+			return l[i]
+		else:
+			l.insert(i, tf.nn.relu(tf.matmul(l[i-1],W_fc[i]) + b_fc[i]))
 
-    W_fc2 = weight_variable([n_nodes_hl1, n_nodes_hl2])
-    b_fc2 = bias_variable([n_nodes_hl2])
-
-    W_fc3 = weight_variable([n_nodes_hl2, n_nodes_hl3])
-    b_fc3 = bias_variable([n_nodes_hl3])
-
-    W_output = weight_variable([n_nodes_hl3,n_classes])
-    b_output = bias_variable([n_classes])
-
-    l1 = tf.nn.relu(tf.matmul(data,W_fc1) + b_fc1)
-    l2 = tf.nn.relu(tf.matmul(l1,W_fc2) + b_fc2)
-    l3 = tf.nn.relu(tf.matmul(l2,W_fc3) + b_fc3)
-
-    output = tf.matmul(l3, W_output) + b_output
-    return output
 
 #### Convolutional neural network with 2 layers of convolution and 2 layers of pooling (alternated)
 #### followed by one fully connected layer of 1024 neruons
@@ -146,6 +155,4 @@ def train_neural_network2(x):
 		#print("test accuracy %g"%accuracy.eval(feed_dict={x: mnist.test.images, y: mnist.test.labels, keep_prob: 1.0}))
 
 #### time to train our network
-train_neural_network(x, old_neural_network_model)
 train_neural_network(x, neural_network_model)
-train_neural_network(x, conv_network_model)
