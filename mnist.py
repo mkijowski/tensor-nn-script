@@ -20,11 +20,15 @@ if len(args.numNodesPer) > 1:
 	# check to make sure there are same number of values as the number of layers
 	if not len(args.numNodesPer) == args.numLayers:
 		print 'Must have at least ' + str(args.numLayers) + ' of Nodes Per Layer arguments'
+	n_nodes_hl = args.numNodesPer
 
-# Define a list of size numLayers. (Because python wants to .append() for a list, and I don't conform to their standards)
+if len(args.numNodesPer) == 1:
+	n_nodes_hl = []
+	numnodes = args.numNodesPer
+	for i in xrange(args.numLayers):
+		n_nodes_hl.extend(numnodes)
+
 hidden_layers = [None]*args.numLayers
-n_nodes_hl = args.numNodesPer
-##########
 
 n_classes = 10 		 ###mnist data is handwritten digits 0-9
 n_inputs = 784 		 ###mnist data is 28x28 pixels which we squahs to 784
@@ -64,8 +68,6 @@ def neural_network_model(data):
 			W_fc.insert(i, weight_variable([n_nodes_hl[i-1],n_classes]))
 			b_fc.insert(i, bias_variable([n_classes]))
 		else:
-			# what if n_nodes_hl is only one value
-			# ex. newmatnn.py 3 784
 			W_fc.insert(i, weight_variable([n_nodes_hl[i-1],n_nodes_hl[i]]))
 			b_fc.insert(i, bias_variable([n_nodes_hl[i]]))
  
