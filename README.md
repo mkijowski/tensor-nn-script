@@ -1,5 +1,18 @@
 # tensor-nn-script
-deep.py added
+mnist.py is now the most up to date of files.
+
+it takes 2 forms of input upon execution: int(number of hidden layers) 
+and either a single integer value of the number of nodes to use in all hidden layers
+OR a number (Y) of integers to be used as the number of nodes in each hidden layer
+where Y = the number of hidden layers
+
+examples:
+python mnist.py 5 100                  ## 5 hidden layers with 100 nodes in each layer
+python mnist.py 5 100 200 300 400 500  ## 5 hidden layes with each alyer having 100 more nodes than the one before it
+
+BAD example
+python 5 100 200
+
 This repository makes it easier to follow the video here: https://www.youtube.com/watch?v=oYbVFhK_olY
 
 In the video he references using for loops to automatically generate a python file that is ready to execute (operating on the mnist data set)
