@@ -5,8 +5,12 @@ import argparse
 #mnist data loaded here, change!
 from tensorflow.examples.tutorials.mnist import input_data
 mnist = input_data.read_data_sets("/tmp/data/", one_hot=True)
+#one_hot - a vector which is 0 in most dimensions and 1 in a single dimension.
+#The dimension that corresponds to the digit that each image represents is marked as 1.
+#BTW, tensor means n-dimensional array.
 
 ##########
+# note: this is all new, parsing allows for user to input a series of numbers for altering the number of layers in the fully connected neural network model and the number of nodes per layer
 parser = argparse.ArgumentParser(description='Demonstrate user input argument parsing')
 # collects one argument
 parser.add_argument('numLayers', type=int, help='Number of hidden layers')
