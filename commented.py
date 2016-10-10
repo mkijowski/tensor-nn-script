@@ -23,6 +23,16 @@ batch_size = 500	 ### batch size can be tweaked depending on amount of RAM
 x = tf.placeholder('float',[None, n_inputs])
 y = tf.placeholder('float',[None, n_classes])
 
+<<<<<<< HEAD
+=======
+##see: https://www.tensorflow.org/versions/r0.10/api_docs/python/state_ops.html#Variable
+## in order to use the variable swe first initialise them with zeros with the tf.zeros function 
+## which requires the tensor's shape.  W is the variable for your weight tensor and b is the bias tensor
+##These have been deprecated by the functions weight variable and bias_variable below
+#W = tf.Variable(tf.zeros([n_inputs,n_classes]))
+#b = tf.Variable(tf.zeros([n_classes]))
+
+>>>>>>> 2599c0ed58c7b3bced08886cedeb0727e58d3f73
 ## function that takes input of the shape of a tensor and initializes it using truncated_normal distribution
 ##see: https://www.tensorflow.org/versions/r0.10/api_docs/python/state_ops.html#Variable
 ##and: https://www.tensorflow.org/versions/r0.10/api_docs/python/constant_op.html
@@ -40,9 +50,15 @@ def bias_variable(shape):
 ## see: https://www.tensorflow.org/versions/r0.10/api_docs/python/nn.html#conv2d
 ## takes as input the OUTPUT DATA FROM PREV LAYER*reshaped* input image data x and a weight tensor W
 ##   has several more options see link above, but defined here are the stride distance and padding
+<<<<<<< HEAD
 def conv2d(x, W):
     return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
 #The strides argument specifies how much the window shifts in each of the input dimensions. The dimensions are batch, height, width, chanels. Here, because the image is greyscale, there is only 1 dimension. A batch size of 1 means that a single example is processed at a time. A value of 1 in row/column means that we apply the operator at every row and column. When the padding parameter takes the value of 'SAME', this means that for those elements which have the filter sticking out during convolution, the portions of the filter that stick out are assumed to contribute 0 to the dot product. The size of the image remains the same after the operation remains the same. When the padding = 'VALID' option is used, the filter is centered along the center of the image, so that the filter does not stick out. So the output image size would have been 3X3. 
+=======
+##  ??? the dimension of the strides must be the same as the input, so why is it 4D and not 2D?
+def conv2d(x, W):
+    return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
+>>>>>>> 2599c0ed58c7b3bced08886cedeb0727e58d3f73
 
 ## function that controls the pooling layers in the convolutional network model
 ## see: https://www.tensorflow.org/versions/r0.10/api_docs/python/nn.html#max_pool
@@ -90,6 +106,10 @@ def conv_network_model(x):
     ## creates a weight tensor of the given shape
     ## the shape corresponds to the convolutional layers filter size (5x5), the input data dimensionality (1D input of 784 pixels)
     ##  and number of features or parallel slices (32)
+<<<<<<< HEAD
+=======
+    ## ?? why not omit the dimensionality data
+>>>>>>> 2599c0ed58c7b3bced08886cedeb0727e58d3f73
     ## number of filters should be a power of 2 because this improves performance (look into this!!!!
     W_conv1 = weight_variable([5, 5, 1, 32])
     ## creates a bias tensor of the given shape
@@ -137,13 +157,17 @@ def conv_network_model(x):
     W_fc2 = weight_variable([1024, 10])
     b_fc2 = bias_variable([10])
 
+<<<<<<< HEAD
 ##  This is commented out becuase we run the softmax in the training.  This is only for convenience so that you only need to look at the training function to select proper training attributes (otherwise youd need to look up here to see what the activation of each output is
+=======
+>>>>>>> 2599c0ed58c7b3bced08886cedeb0727e58d3f73
 #    output=tf.nn.softmax(tf.matmul(h_fc1_drop, W_fc2) + b_fc2)
     output=tf.matmul(h_fc1, W_fc2) + b_fc2
     return output
 
 def train_neural_network(x, network_model):
     prediction = network_model(x)
+<<<<<<< HEAD
     #cost = tf.reduce_mean(-tf.reduce_sum(y * tf.log(prediction), reduction_indices=[1]))
     cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(prediction,y) )
 #logit - unnormalized log of probability
@@ -154,6 +178,13 @@ def train_neural_network(x, network_model):
 #checks whether for the first dimension the largest probabiliry with one hot encoding is the same with the predicted and actual values. 
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 #reduce_mean reduces all dimensions by computing the mean.
+=======
+#    cost = tf.reduce_mean(-tf.reduce_sum(y * tf.log(prediction), reduction_indices=[1]))
+    cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(prediction,y) )
+    train_step = tf.train.AdamOptimizer(1e-2).minimize(cost)
+    correct_prediction = tf.equal(tf.argmax(prediction,1), tf.argmax(y,1))
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+>>>>>>> 2599c0ed58c7b3bced08886cedeb0727e58d3f73
     with tf.Session() as sess:
 	sess.run(tf.initialize_all_variables())
 	for i in range(20000):
@@ -182,10 +213,16 @@ def other_train_neural_network(x, network_model):
 				epoch_x, epoch_y = mnist.train.next_batch(batch_size)
 				_, c = sess.run([train_step, cost], feed_dict = {x: epoch_x, y: epoch_y})
 				epoch_loss += c
+<<<<<<< HEAD
 #Calculates loss for the batch for reporting.
 			print('Epoch', epoch, 'completed out of', hm_epochs, 'loss:', epoch_loss)
 		print('Accuracy:',accuracy.eval({x:mnist.test.images, y:mnist.test.labels}))
 
 #The following execute both of the above training methods on the fully connected neural network model.  These can also be run on the convolutional model by replacing the model name being passed to the training function
+=======
+			print('Epoch', epoch, 'completed out of', hm_epochs, 'loss:', epoch_loss)
+		print('Accuracy:',accuracy.eval({x:mnist.test.images, y:mnist.test.labels}))
+
+>>>>>>> 2599c0ed58c7b3bced08886cedeb0727e58d3f73
 train_neural_network(x, neural_network_model)
 other_train_neural_network(x, neural_network_model)
