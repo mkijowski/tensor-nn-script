@@ -141,9 +141,10 @@ def train_neural_network(x, network_model):
 
 #### training model from tensorflow deep mnist for experts walkthrough
 #### has been altered slightly to allow for different neural network models and to be interchangeable with above training model
-def train_neural_network2(x):
-    prediction = neural_network_model(x)
-    cost = tf.reduce_mean(-tf.reduce_sum(y * tf.log(prediction), reduction_indices=[1]))
+def train_neural_network2(x,network_model):
+    prediction = network_model(x)
+    cost = tf.reduce_mean( tf.nn.softmax_cross_entropy_with_logits(prediction,y) )
+    #cost = tf.reduce_mean(-tf.reduce_sum(y * tf.log(prediction), reduction_indices=[1]))
     train_step = tf.train.AdamOptimizer(1e-4).minimize(cost)
     correct_prediction = tf.equal(tf.argmax(prediction,1), tf.argmax(y,1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
@@ -154,11 +155,13 @@ def train_neural_network2(x):
             if i%100 == 0:
 		train_accuracy = accuracy.eval(feed_dict={x:batch[0], y: batch[1]})
 		print("step %d, training accuracy %g"%(i, train_accuracy))
-		train_step.run(feed_dict={x: batch[0], y: batch[1]})
-		print("test accuracy %g"%accuracy.eval(feed_dict={x: mnist.test.images, y: mnist.test.labels}))
+	    train_step.run(feed_dict={x: batch[0], y: batch[1]})
+
+	print("test accuracy %g"%accuracy.eval(feed_dict={x: mnist.test.images, y: mnist.test.labels}))
 		#train_accuracy = accuracy.eval(feed_dict={x:batch[0], y: batch[1], keep_prob: 1.0})
 		#train_step.run(feed_dict={x: batch[0], y: batch[1], keep_prob: 0.5})
 		#print("test accuracy %g"%accuracy.eval(feed_dict={x: mnist.test.images, y: mnist.test.labels, keep_prob: 1.0}))
 
 #### time to train our network
+train_neural_network2(x, neural_network_model)
 train_neural_network(x, neural_network_model)
