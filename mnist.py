@@ -41,6 +41,7 @@ x = tf.placeholder('float',[None, n_inputs])
 y = tf.placeholder('float',[None, n_classes])
 W = tf.Variable(tf.zeros([n_inputs,n_classes]))
 b = tf.Variable(tf.zeros([n_classes]))
+keep_prob = tf.placeholder(tf.float32)
 
 #### basic function definitions for initializing weight and bias tensors
 def weight_variable(shape):
@@ -79,7 +80,7 @@ def neural_network_model(data):
 		if i==0:
 			l.insert(i, tf.nn.relu(tf.matmul(data,W_fc[i]) + b_fc[i]))
 		elif i == args.numLayers - 1:
-			l.insert(i, tf.matmul(l[i-1], W_fc[i]) + b_fc[i])
+			l.insert(i, tf.matmul(tf.nn.dropout(l[i-1],keep_prob), W_fc[i]) + b_fc[i])
 			return l[i]
 		else:
 			l.insert(i, tf.nn.relu(tf.matmul(l[i-1],W_fc[i]) + b_fc[i]))
@@ -150,18 +151,21 @@ def train_neural_network2(x,network_model):
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     with tf.Session() as sess:
 	sess.run(tf.initialize_all_variables())
-	for i in range(20000):
-            batch = mnist.train.next_batch(50)
+	for i in range(2000):
+            batch = mnist.train.next_batch(batch_size)
             if i%100 == 0:
-		train_accuracy = accuracy.eval(feed_dict={x:batch[0], y: batch[1]})
-		print("step %d, training accuracy %g"%(i, train_accuracy))
-	    train_step.run(feed_dict={x: batch[0], y: batch[1]})
+		##Uncomment for no dropout
+		#train_accuracy = accuracy.eval(feed_dict={x:batch[0], y: batch[1]})
+		#print("step %d, training accuracy %g"%(i, train_accuracy))
+	    #train_step.run(feed_dict={x: batch[0], y: batch[1]})
+	#print("test accuracy %g"%accuracy.eval(feed_dict={x: mnist.test.images, y: mnist.test.labels}))
 
-	print("test accuracy %g"%accuracy.eval(feed_dict={x: mnist.test.images, y: mnist.test.labels}))
-		#train_accuracy = accuracy.eval(feed_dict={x:batch[0], y: batch[1], keep_prob: 1.0})
-		#train_step.run(feed_dict={x: batch[0], y: batch[1], keep_prob: 0.5})
-		#print("test accuracy %g"%accuracy.eval(feed_dict={x: mnist.test.images, y: mnist.test.labels, keep_prob: 1.0}))
+		####uncomment for dropout
+		train_accuracy = accuracy.eval(feed_dict={x:batch[0], y: batch[1], keep_prob: 1.0})
+		print("step %d, training accuracy %g"%(i, train_accuracy))
+	    train_step.run(feed_dict={x: batch[0], y: batch[1], keep_prob: 1.0})
+	print("test accuracy %g"%accuracy.eval(feed_dict={x: mnist.test.images, y: mnist.test.labels, keep_prob: 1.0}))
 
 #### time to train our network
 train_neural_network2(x, neural_network_model)
-train_neural_network(x, neural_network_model)
+#train_neural_network(x, neural_network_model)
